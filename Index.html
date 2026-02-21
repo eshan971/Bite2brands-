@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Positivus · slow motion + sliding reviews</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Space Grotesk', sans-serif; }
+        .positivus-green { background-color: #B9FF66; }
+        .positivus-dark { background-color: #191A23; }
+        .positivus-gray { background-color: #F3F3F3; }
+        
+        /* brutalist card with slow-motion hover */
+        .brutalist-card {
+            border: 1px solid black;
+            border-radius: 45px;
+            box-shadow: 0 5px 0 0 rgba(0,0,0,1);
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* slow‑mo */
+            will-change: transform, box-shadow;
+        }
+        .brutalist-card:hover {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 0 rgba(0,0,0,1);
+        }
+        .section-label {
+            display: inline-block;
+            padding: 0 5px;
+            border-radius: 7px;
+            font-weight: 500;
+            font-size: 1.875rem;
+        }
+
+        /* slow pulse for cta shape (optional) */
+        .slow-pulse {
+            animation: pulseGlow 4s infinite ease-in-out;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 10px 10px 0 0 rgba(0,0,0,1); transform: scale(1); }
+            50% { box-shadow: 14px 14px 0 0 rgba(0,0,0,0.8); transform: scale(1.02); }
+            100% { box-shadow: 10px 10px 0 0 rgba(0,0,0,1); transform: scale(1); }
+        }
+
+        /* review slider fade + slide */
+        .review-slider-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 45px;
+        }
+        .review-track {
+            display: flex;
+            transition: transform 0.7s ease-in-out; /* slow slide */
+            will-change: transform;
+        }
+        .review-card {
+            flex: 0 0 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 2rem;
+            background-color: #191A23;
+            border: 1px solid #3a3c45;
+            border-radius: 45px;
+            color: white;
+            box-shadow: 0 8px 0 #0f0f14;
+        }
+        .slider-btn {
+            background-color: #B9FF66;
+            border: 2px solid black;
+            border-radius: 9999px;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s background-color, 0.2s transform;
+            box-shadow: 0 4px 0 black;
+        }
+        .slider-btn:hover {
+            background-color: #a3e64e;
+            transform: scale(1.03);
+        }
+        .slider-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+        .dot {
+            width: 14px;
+            height: 14px;
+            background-color: #ccc;
+            border-radius: 50%;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+        .dot.active {
+            background-color: #B9FF66;
+            border: 2px solid black;
+        }
+    </style>
+</head>
+<body class="bg-white text-black">
+
+    <!-- Navigation fixed (unchanged) -->
+    <header class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-50 border-b border-gray-100 py-6">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-2xl font-bold">
+                <div class="w-6 h-6 bg-black rounded-full flex items-center justify-center rotate-45">
+                    <div class="w-3 h-3 border-2 border-white"></div>
+                </div>
+                Positivus
+            </div>
+            <nav class="hidden md:flex items-center gap-8 text-lg">
+                <a href="#" class="hover:underline">About us</a>
+                <a href="#" class="hover:underline">Services</a>
+                <a href="#" class="hover:underline">Use Cases</a>
+                <a href="#" class="hover:underline">Pricing</a>
+                <a href="#" class="hover:underline">Blog</a>
+                <button class="border border-black px-6 py-3 rounded-xl hover:bg-[#B9FF66] transition-colors">Request a quote</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pt-32">
+        <!-- Hero Section (same but with slow appearance via transition) -->
+        <section class="max-w-7xl mx-auto px-6 py-20 grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h1 class="text-5xl md:text-6xl font-medium leading-tight mb-8 animate-[fadeIn_1.2s_ease]">Navigating the digital landscape for success</h1>
+                <p class="text-xl text-gray-600 mb-10 max-w-lg animate-[fadeIn_1.5s_ease]">Our digital marketing agency helps businesses grow and succeed online through a range of services including SEO, PPC, social media marketing, and content creation.</p>
+                <button class="bg-black text-white px-8 py-5 rounded-2xl text-xl hover:bg-gray-800 transition-all duration-500">Book a consultation</button>
+            </div>
+            <div class="hidden md:block slow-float">
+                <svg viewBox="0 0 400 400" class="w-full">
+                    <circle cx="200" cy="200" r="180" fill="none" stroke="black" stroke-width="1" stroke-dasharray="8 8" />
+                    <path d="M100 200 L250 120 L250 280 Z" fill="#B9FF66" stroke="black" stroke-width="2" />
+                    <rect x="250" y="160" width="40" height="80" fill="black" />
+                </svg>
+            </div>
+        </section>
+        <style> @keyframes fadeIn { 0% { opacity: 0; transform: translateY(15px); } 100% { opacity: 1; transform: translateY(0); } } </style>
+
+        <!-- Logos -->
+        <section class="max-w-7xl mx-auto px-6 py-12 flex flex-wrap justify-between items-center gap-8 opacity-50 grayscale">
+            <span class="text-2xl font-bold">Amazon</span>
+            <span class="text-2xl font-bold">Dribbble</span>
+            <span class="text-2xl font-bold">HubSpot</span>
+            <span class="text-2xl font-bold">Notion</span>
+            <span class="text-2xl font-bold">Netflix</span>
+            <span class="text-2xl font-bold">Zoom</span>
+        </section>
+
+        <!-- Services -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="flex items-center gap-10 mb-20">
+                <h2 class="section-label positivus-green">Services</h2>
+                <p class="max-w-xl text-lg">At our digital marketing agency, we offer a range of services to help businesses grow and succeed online. These services include:</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-10">
+                <!-- Card 1 -->
+                <div class="brutalist-card p-12 bg-gray-100 flex justify-between items-center">
+                    <div class="flex flex-col gap-24">
+                        <span class="text-2xl font-medium positivus-green px-2 rounded-md">Search engine optimization</span>
+                        <a href="#" class="flex items-center gap-4 text-xl font-medium">
+                            <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center transition-transform duration-300 hover:rotate-45">↗</div>
+                            Learn more
+                        </a>
+                    </div>
+                    <div class="text-6xl opacity-20">🔍</div>
+                </div>
+                <!-- Card 2 -->
+                <div class="brutalist-card p-12 positivus-green flex justify-between items-center">
+                    <div class="flex flex-col gap-24">
+                        <span class="text-2xl font-medium bg-white px-2 rounded-md">Pay-per-click advertising</span>
+                        <a href="#" class="flex items-center gap-4 text-xl font-medium">
+                            <div class="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center transition-transform duration-300 hover:rotate-45">↗</div>
+                            Learn more
+                        </a>
+                    </div>
+                    <div class="text-6xl opacity-20">🖱️</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA with slow pulse -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="positivus-gray rounded-[45px] p-16 flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="md:w-1/2">
+                    <h3 class="text-3xl font-medium mb-4">Let's make things happen</h3>
+                    <p class="text-lg mb-8">Contact us today to learn more about how our digital marketing services can help your business grow and succeed online.</p>
+                    <button class="bg-black text-white px-8 py-5 rounded-2xl text-xl hover:scale-105 transition-transform duration-700">Get your free proposal</button>
+                </div>
+                <div class="md:w-1/2 flex justify-center">
+                    <div class="w-64 h-64 bg-[#B9FF66] rounded-3xl border border-black shadow-[10px_10px_0_0_rgba(0,0,0,1)] slow-pulse"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process (same but with slow hover) -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="flex items-center gap-10 mb-20">
+                <h2 class="section-label positivus-green">Working Process</h2>
+                <p class="max-w-xl text-lg">Step-by-Step Guide to Achieving Your Business Goals</p>
+            </div>
+            
+            <div class="space-y-6">
+                <div class="brutalist-card p-10 bg-[#B9FF66]">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-6">
+                            <span class="text-5xl font-medium">01</span>
+                            <span class="text-2xl font-medium">Consultation</span>
+                        </div>
+                        <div class="w-10 h-10 border border-black rounded-full flex items-center justify-center text-2xl">−</div>
+                    </div>
+                    <p class="text-lg pt-8 border-t border-black">
+                        During the initial consultation, we will discuss your business goals and objectives, target audience, and current marketing efforts.
+                    </p>
+                </div>
+                <div class="brutalist-card p-10 bg-white">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-6">
+                            <span class="text-5xl font-medium">02</span>
+                            <span class="text-2xl font-medium">Research and Strategy</span>
+                        </div>
+                        <div class="w-10 h-10 border border-black rounded-full flex items-center justify-center text-2xl">+</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDING REVIEWS with left/right buttons (slow slide) -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="flex items-center gap-10 mb-20">
+                <h2 class="section-label positivus-green">Testimonials</h2>
+                <p class="max-w-xl text-lg">Hear from our clients -- slow sliding with navigation</p>
+            </div>
+
+            <div class="review-slider-container bg-[#191A23] p-6 md:p-10 rounded-[45px] border border-black shadow-[0_12px_0_0_#000]">
+                <!-- track -->
+                <div id="reviewTrack" class="review-track">
+                    <!-- slide 1 -->
+                    <div class="review-card">
+                        <div class="flex flex-col h-full">
+                            <p class="text-xl md:text-2xl leading-relaxed mb-8">"Positivus transformed our online presence. Their SEO strategy boosted our traffic by 200% in just three months. Professional and creative."</p>
+                            <div class="mt-auto">
+                                <span class="text-[#B9FF66] text-xl block">Maria Schmidt</span>
+                                <span class="text-gray-300">CMO, Bloom Cosmetics</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- slide 2 -->
+                    <div class="review-card">
+                        <div class="flex flex-col h-full">
+                            <p class="text-xl md:text-2xl leading-relaxed mb-8">"The PPC campaigns they designed delivered an ROAS of 4.5x. They really understand the digital landscape. Highly recommend!"</p>
+                            <div class="mt-auto">
+                                <span class="text-[#B9FF66] text-xl block">James Wright</span>
+                                <span class="text-gray-300">Founder, WrightTech</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- slide 3 -->
+                    <div class="review-card">
+                        <div class="flex flex-col h-full">
+                            <p class="text-xl md:text-2xl leading-relaxed mb-8">"Working with Positivus feels like a true partnership. Their content marketing brought our brand story to life. Patient and brilliant."</p>
+                            <div class="mt-auto">
+                                <span class="text-[#B9FF66] text-xl block">Elena Park</span>
+                                <span class="text-gray-300">Director, Artisan Roast</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- slide 4 -->
+                    <div class="review-card">
+                        <div class="flex flex-col h-full">
+                            <p class="text-xl md:text-2xl leading-relaxed mb-8">"Incredible results from their social media strategy. Engagement tripled and sales followed. Couldn't be happier."</p>
+                            <div class="mt-auto">
+                                <span class="text-[#B9FF66] text-xl block">Carlos Mendez</span>
+                                <span class="text-gray-300">E‑commerce Manager, Viva</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- left / right buttons + dots -->
+                <div class="flex justify-between items-center mt-8">
+                    <div class="flex gap-4">
+                        <button id="prevReview" class="slider-btn text-3xl pb-1">←</button>
+                        <button id="nextReview" class="slider-btn text-3xl pb-1">→</button>
+                    </div>
+                    <div class="flex gap-3" id="dotContainer">
+                        <span class="dot active"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form -->
+        <section class="max-w-7xl mx-auto px-6 py-20">
+            <div class="flex items-center gap-10 mb-20">
+                <h2 class="section-label positivus-green">Contact Us</h2>
+                <p class="max-w-xl text-lg">Connect with Us: Let's Discuss Your Digital Marketing Needs</p>
+            </div>
+            
+            <div class="positivus-gray rounded-[45px] p-16 grid md:grid-cols-2 gap-20">
+                <form class="space-y-6">
+                    <div class="flex gap-8 mb-10">
+                        <label class="flex items-center gap-3"><input type="radio" checked name="type" class="w-6 h-6 accent-[#B9FF66]"> Say Hi</label>
+                        <label class="flex items-center gap-3"><input type="radio" name="type" class="w-6 h-6 accent-[#B9FF66]"> Get a Quote</label>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block font-medium">Name</label>
+                        <input type="text" placeholder="Name" class="w-full p-4 rounded-xl border border-black transition-shadow duration-500 focus:shadow-[4px_4px_0_black] outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block font-medium">Email*</label>
+                        <input type="email" placeholder="Email" class="w-full p-4 rounded-xl border border-black transition-shadow duration-500 focus:shadow-[4px_4px_0_black] outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block font-medium">Message*</label>
+                        <textarea rows="5" placeholder="Message" class="w-full p-4 rounded-xl border border-black transition-shadow duration-500 focus:shadow-[4px_4px_0_black] outline-none"></textarea>
+                    </div>
+                    <button class="w-full bg-black text-white py-5 rounded-2xl text-xl hover:bg-gray-800 transition-all duration-500 hover:scale-[1.02]">Send Message</button>
+                </form>
+                <div class="hidden md:flex items-center justify-center">
+                    <div class="w-80 h-80 bg-black rounded-full opacity-5 animate-pulse duration-1000"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-[#191A23] text-white py-20 mt-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-16 border-b border-gray-700 pb-12">
+                <div class="text-2xl font-bold mb-8 md:mb-0">Positivus</div>
+                <nav class="flex gap-8">
+                    <a href="#" class="underline">About us</a>
+                    <a href="#" class="underline">Services</a>
+                    <a href="#" class="underline">Use Cases</a>
+                    <a href="#" class="underline">Pricing</a>
+                    <a href="#" class="underline">Blog</a>
+                </nav>
+            </div>
+            <div class="flex flex-col md:flex-row justify-between gap-12">
+                <div class="space-y-4">
+                    <div class="bg-[#B9FF66] text-black px-2 py-1 rounded-md font-medium inline-block">Contact us:</div>
+                    <p>Email: info@positivus.com</p>
+                    <p>Phone: 555-567-8901</p>
+                    <p>Address: 1234 Main St, Moonstone City</p>
+                </div>
+                <div class="bg-[#292A32] p-8 rounded-2xl flex-1 max-w-lg flex gap-4">
+                    <input type="email" placeholder="Email" class="bg-transparent border border-white rounded-xl px-6 py-4 flex-1 placeholder-gray-400 transition-all duration-500 focus:border-[#B9FF66]">
+                    <button class="bg-[#B9FF66] text-black px-8 py-4 rounded-xl font-medium hover:bg-[#a3e64e] transition-colors duration-500">Subscribe</button>
+                </div>
+            </div>
+            <div class="mt-20 pt-8 border-t border-gray-700 text-gray-400 text-sm">
+                © 2023 Positivus. All Rights Reserved. <a href="#" class="ml-4 underline">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Slider logic (slow slide) -->
+    <script>
+        (function() {
+            const track = document.getElementById('reviewTrack');
+            const prev = document.getElementById('prevReview');
+            const next = document.getElementById('nextReview');
+            const dots = document.querySelectorAll('.dot');
+            if (!track) return;
+         const cards = document.querySelectorAll('.review-card');
+            const totalSlides = cards.length;
+            let currentIndex = 0;
+            
+            const updateSlider = () => {
+                const width = cards[0]?.offsetWidth || 0;
+                track.style.transform = `translateX(-${currentIndex * width}px)`;
+                
+                dots.forEach((dot, idx) => {
+                    dot.classList.toggle('active', idx === currentIndex);
+                });
+            };
+            
+            next.addEventListener('click', () => {
+                currentIndex = (currentIndex + 1) % totalSlides;
+                updateSlider();
+            });
+            
+            prev.addEventListener('click', () => {
+                currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                updateSlider();
+            });
+            
+            dots.forEach((dot, i) => {
+                dot.addEventListener('click', () => {
+                    currentIndex = i;
+                    updateSlider();
+                });
+            });
+            
+            window.addEventListener('resize', () => updateSlider()); // adjust on resize
+            updateSlider();
+        })();
+    </script>
+
+    <!-- additional slow-motion note: all brutalist cards use 0.4s cubic-bezier, slider uses 0.7s ease-in-out -->
+</body>
+</html>
+
